@@ -3,8 +3,11 @@
 
 ## Progress:
 
-+ Day 1 
++ Day 1
 	+ Part 1: ✅
 	+ Part 2: ✅
 + Day 2
+	+ Part 1: ✅
+	+ Part 2: ✅
++ Day 3
 	+ 🔄

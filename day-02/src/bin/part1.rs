@@ -30,27 +30,27 @@ fn get_possible_count(input: &str) -> i32 {
     sum
 }
 
-fn get_prefix_indices(line: &str) -> [usize; 2] {
+pub fn get_prefix_indices(line: &str) -> [usize; 2] {
     let start = 5; // index of the next char after "Game "
     let end = line.find(":").unwrap();
 
     [start, end]
 }
 
-fn get_id(line: &str, start: usize, end: usize) -> i32 {
+pub fn get_id(line: &str, start: usize, end: usize) -> i32 {
     line[start..end]
         .parse::<i32>()
         .unwrap()
 }
 
-fn remove_prefix(line: &str, to_index: usize) -> String {
+pub fn remove_prefix(line: &str, to_index: usize) -> String {
     let mut line_wo_prefix = String::from(line);
     line_wo_prefix.replace_range(0..to_index, "");
 
     line_wo_prefix
 }
 
-fn get_sets(line: &str) -> Vec<[i32; 3]> {
+pub fn get_sets(line: &str) -> Vec<[i32; 3]> {
     let mut result: Vec<[i32; 3]> = Vec::new();
 
     let parts = line.split("; ");
