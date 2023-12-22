@@ -10,8 +10,8 @@ fn get_points(input: &str) -> i32 {
     for line in input.lines() {
         let mut points_in_pile = 0;
 
-        let prefix = get_prefix_indices(line);
-        let line_wo_prefix = remove_prefix(line, prefix[1] + 2);
+        let prefix_end_index = get_prefix_end_index(line);
+        let line_wo_prefix = remove_prefix(line, prefix_end_index);
 
         let (left, right) = split_left_right(&line_wo_prefix);
 
@@ -33,11 +33,9 @@ fn get_points(input: &str) -> i32 {
     points
 }
 
-fn get_prefix_indices(line: &str) -> [usize; 2] {
-    let start = 5; // index of the next char after "Card "
+fn get_prefix_end_index(line: &str) -> usize {
     let end = line.find(":").unwrap();
-
-    [start, end]
+    end + 1
 }
 
 fn remove_prefix(line: &str, to_index: usize) -> String {
