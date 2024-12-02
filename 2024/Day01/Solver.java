@@ -1,7 +1,7 @@
 package Day01;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,19 +66,14 @@ public class Solver {
 
     int result = 0;
 
-    ArrayList<Integer> results = new ArrayList<>(Collections.nCopies(left.size(), 0));
-    for (int i = 0; i < left.size(); i++) {
-      Integer scoredValue = left.get(i);
-
-      for (int j = 0; j < right.size(); j++) {
-        if (right.get(j).equals(scoredValue)) {
-          results.set(i, results.get(i) + right.get(j));
-        }
-      }
+    HashMap<Integer, Integer> rightFrequencyMap = new HashMap<>();
+    for (Integer value : right) {
+      rightFrequencyMap.put(value, rightFrequencyMap.getOrDefault(value, 0) + 1);
     }
 
-    for (Integer score : results) {
-      result += score;
+    for (Integer value : left) {
+      int frequency = rightFrequencyMap.getOrDefault(value, 0);
+      result += value * frequency;
     }
 
     return Integer.toString(result);
