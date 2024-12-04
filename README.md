@@ -11,5 +11,6 @@ java -cp out Day01.Main
 
 | Day | Name                                | Status |
 | --- | ----------------------------------- | ------ |
-|  1  | Historian Hysteria                  |   ✅   |
-|  2  | Red-Nosed Reports                   |   ✅   |
+|  1  | Historian Hysteria                  |  ⭐⭐  |
+|  2  | Red-Nosed Reports                   |  ⭐⭐  |
+|  3  | Mull It Over                        |  ⭐⭐  |
