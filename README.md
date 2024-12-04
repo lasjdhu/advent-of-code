@@ -14,3 +14,4 @@ java -cp out Day01.Main
 |  1  | Historian Hysteria                  |  ⭐⭐  |
 |  2  | Red-Nosed Reports                   |  ⭐⭐  |
 |  3  | Mull It Over                        |  ⭐⭐  |
+|  4  | Ceres Search                        |  ⭐⭐  |
