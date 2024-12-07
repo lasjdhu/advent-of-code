@@ -15,3 +15,6 @@ java -cp out Day01.Main
 |  2  | Red-Nosed Reports                   |  ⭐⭐  |
 |  3  | Mull It Over                        |  ⭐⭐  |
 |  4  | Ceres Search                        |  ⭐⭐  |
+|  5  | Print Queue                         |  ⭐⭐  |
+|  6  | Guard Gallivant                     |  ⭐⭐  |
+|  7  | Bridge Repair                       |  ⭐⭐  |
