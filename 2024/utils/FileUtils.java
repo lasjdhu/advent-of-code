@@ -12,4 +12,10 @@ public class FileUtils {
       return br.lines().collect(Collectors.toList());
     }
   }
+
+  public static String readLine(String filePath) throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+      return br.readLine();
+    }
+  }
 }
