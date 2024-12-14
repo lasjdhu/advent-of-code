@@ -1,0 +1,36 @@
+#!/bin/sh
+
+YEAR=""
+DAY=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -y | --year)
+    YEAR="$2"
+    shift
+    shift
+    ;;
+  -d | --day)
+    DAY="$2"
+    shift
+    shift
+    ;;
+  *)
+    echo "Unknown option $1"
+    exit 1
+    ;;
+  esac
+done
+
+if [[ -z "$YEAR" || -z "$DAY" ]]; then
+  echo "Usage: $0 -y <YEAR> -d <DAY>"
+  exit 1
+fi
+
+javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out
+if [[ $? -ne 0 ]]; then
+  echo "Compilation failed."
+  exit 1
+fi
+
+java -cp out "Day$DAY.Main"
