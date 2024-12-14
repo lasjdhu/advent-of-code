@@ -3,6 +3,12 @@
 ## Usage
 
 ```sh
+./solve -y 2024 -d 01
+```
+
+or
+
+```sh
 javac 2024/utils/FileUtils.java 2024/Day01/*.java -d out
 java -cp out Day01.Main
 ```
