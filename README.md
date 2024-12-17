@@ -29,3 +29,6 @@ java -cp out Day01.Main
 |  10  | Hoof It                             |  ⭐⭐  |
 |  11  | Plutonian Pebbles                   |  ⭐⭐  |
 |  12  | Garden Groups                       |  ⭐    |
+|  13  | Claw Contraption                    |  ⭐⭐  |
+|  14  | Restroom Redoubt                    |  ⭐⭐  |
+|  15  | Warehouse Woes                      |  ⭐    |
