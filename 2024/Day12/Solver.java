@@ -15,6 +15,7 @@ public class Solver {
 
   private void loadInput(String filename) {
     try {
+      totalPrice = 0;
       input.clear();
       input = FileUtils.readLines(filename);
     } catch (IOException e) {
@@ -28,6 +29,7 @@ public class Solver {
     int area = 0;
     int perimeter = 0;
 
+    List<int[]> boundary = new ArrayList<>();
     List<int[]> toExplore = new ArrayList<>();
     toExplore.add(new int[] {row, col});
 
@@ -41,6 +43,7 @@ public class Solver {
       }
       visited[r][c] = true;
       area++;
+      boolean isBoundary = false;
 
       for (int[] direction : directions) {
         int newRow = r + direction[0];
@@ -54,15 +57,95 @@ public class Solver {
           input.get(newRow).charAt(newCol) != plantType
         ) {
           perimeter++;
+          isBoundary = true;
         } else if (!visited[newRow][newCol]) {
           toExplore.add(new int[] {newRow, newCol});
         }
       }
+
+      if (isBoundary) {
+        boundary.add(new int[]{r, c});
+      }
     }
 
-    // TODO: find sides
-    int sides = 0;
-    totalPrice += area * (discount ? sides : perimeter);
+    if (discount) {
+      int sides = countSides(boundary, plantType);
+      totalPrice += area * sides;
+    } else {
+      totalPrice += area * perimeter;
+    }
+  }
+
+  private int countSides(List<int[]> boundary, char plantType) {
+    Set<String> sides = new HashSet<>();
+
+    for (int[] point : boundary) {
+      int r = point[0];
+      int c = point[1];
+
+      if (r == 0 || input.get(r-1).charAt(c) != plantType) {
+        boolean foundStart = true;
+        for (int[] other : boundary) {
+          if (
+            other[0] == r && other[1] == c-1 &&
+            (other[0] == 0 || input.get(other[0]-1).charAt(other[1]) != plantType)
+          ) {
+            foundStart = false;
+            break;
+          }
+        }
+        if (foundStart) {
+          sides.add("H_" + r + "_" + c + "_N");
+        }
+      }
+      if (r == input.size()-1 || input.get(r+1).charAt(c) != plantType) {
+        boolean foundStart = true;
+        for (int[] other : boundary) {
+          if (
+            other[0] == r && other[1] == c-1 &&
+            (other[0] == input.size()-1 || input.get(other[0]+1).charAt(other[1]) != plantType)
+          ) {
+            foundStart = false;
+            break;
+          }
+        }
+        if (foundStart) {
+          sides.add("H_" + (r+1) + "_" + c + "_S");
+        }
+      }
+      if (c == 0 || input.get(r).charAt(c-1) != plantType) {
+        boolean foundStart = true;
+        for (int[] other : boundary) {
+          if (
+            other[1] == c && other[0] == r-1 &&
+            (other[1] == 0 || input.get(other[0]).charAt(other[1]-1) != plantType)
+          ) {
+            foundStart = false;
+            break;
+          }
+        }
+        if (foundStart) {
+          sides.add("V_" + c + "_" + r + "_W");
+        }
+      }
+      if (c == input.get(r).length()-1 || input.get(r).charAt(c+1) != plantType) {
+        boolean foundStart = true;
+        for (int[] other : boundary) {
+          if (
+            other[1] == c && other[0] == r-1 &&
+            (other[1] == input.get(r).length()-1 || input.get(other[0]).charAt(other[1]+1) != plantType)
+          ) {
+            foundStart = false;
+            break;
+          }
+        }
+        if (foundStart) {
+          sides.add("V_" + (c+1) + "_" + r + "_E");
+        }
+      }
+    }
+
+    return sides.size();
   }
 
   public String partOne() {
@@ -81,7 +164,7 @@ public class Solver {
   }
 
   public String partTwo() {
-    loadInput("2024/Day12/mockupInput.txt");
+    loadInput("2024/Day12/input.txt");
 
     boolean[][] visited = new boolean[input.size()][input.get(0).length()];
     for (int i = 0; i < input.size(); i++) {
@@ -92,7 +175,7 @@ public class Solver {
       }
     }
 
-    return Integer.toString(0);
+    return Integer.toString(totalPrice);
   }
 }
 
