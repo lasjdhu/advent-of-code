@@ -3,34 +3,23 @@ package Day09;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 import utils.FileUtils;
 
 public class Solver {
   private String input = new String();
   private List<String> diskMap = new ArrayList<>();
-  private String diskMapCopy = String.join("", diskMap);
   private Long checksum = 0L;
 
   private void loadInput(String filename) {
     try {
       input = null;
       diskMap.clear();
+      checksum = 0L;
       input = FileUtils.readLine(filename);
     } catch (IOException e) {
       e.printStackTrace();
-    }
-  }
-
-  private boolean isInteger(String str) {
-    if (str == null || str.isEmpty()) {
-      return false;
-    }
-    try {
-      Integer.parseInt(str);
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
     }
   }
 
@@ -70,69 +59,55 @@ public class Solver {
     }
   }
 
-  private List<String> parseForBlocks() {
-    String tmp = String.join("", diskMap);
-    List<String> blocks = new ArrayList<>();
-
-    StringBuilder currentBlock = new StringBuilder();
-    for (int i = 0; i < tmp.length(); i++) {
-      if (currentBlock.length() == 0) {
-        currentBlock.append(tmp.charAt(i));
-      } else if (tmp.charAt(i) == tmp.charAt(i - 1)) {
-        currentBlock.append(tmp.charAt(i));
-      } else {
-        blocks.add(currentBlock.toString());
-        currentBlock = new StringBuilder();
-        currentBlock.append(tmp.charAt(i));
-      }
-
-      if (i == tmp.length() - 1) {
-        blocks.add(currentBlock.toString());
-      }
-    }
-
-    return blocks;
-  }
-
   private void compactFiles() {
-    List<String> blocks = parseForBlocks();
-
-    int j = blocks.size() - 1;
-    for (int i = 0; i < blocks.size(); i++) {
-      if (isInteger(blocks.get(i))) {
-        continue;
-      } else {
-        String currentBlock = blocks.get(i);
-        while (j > 0 && blocks.get(j).length() > blocks.get(i).length() || !isInteger(blocks.get(j))) {
-          j--;
+    Map<Integer, List<Integer>> blocks = new HashMap<>();
+    for (int i = 0; i < diskMap.size(); i++) {
+      if (!diskMap.get(i).equals(".")) {
+        int file = Integer.parseInt(diskMap.get(i));
+        if (!blocks.containsKey(file)) {
+          blocks.put(file, new ArrayList<>());
         }
+        blocks.get(file).add(i);
+      }
+    }
 
-        if (isInteger(blocks.get(j)) && blocks.get(j).length() <= blocks.get(i).length() && j > i) {
-          if (blocks.get(j).length() == blocks.get(i).length()) {
-            blocks.set(i, blocks.get(j));
-            blocks.set(j, currentBlock);
-          } else if (blocks.get(j).length() < blocks.get(i).length()) {
-            int diff = blocks.get(i).length() - blocks.get(j).length();
-            blocks.set(i, blocks.get(j) + ".".repeat(diff));
-            blocks.set(j, currentBlock.substring(0, currentBlock.length() - diff));
+    for (int file = blocks.size() - 1; file >= 0; file--) {
+      List<Integer> positions = blocks.get(file);
+      if (positions == null || positions.isEmpty()) continue;
+
+      int fileSize = positions.size();
+      int currentStart = positions.get(0);
+
+      int bestStart = -1;
+      int currentFreeStart = -1;
+      int consecutiveFreeSpace = 0;
+
+      for (int i = 0; i < currentStart; i++) {
+        if (diskMap.get(i).equals(".")) {
+          if (currentFreeStart == -1) {
+            currentFreeStart = i;
           }
-          j--;
+          consecutiveFreeSpace++;
+          if (consecutiveFreeSpace >= fileSize) {
+            bestStart = currentFreeStart;
+            break;
+          }
+        } else {
+          currentFreeStart = -1;
+          consecutiveFreeSpace = 0;
+        }
+      }
+
+      if (bestStart != -1) {
+        for (int pos : positions) {
+          diskMap.set(pos, ".");
+        }
+
+        for (int i = 0; i < fileSize; i++) {
+          diskMap.set(bestStart + i, Integer.toString(file));
         }
       }
     }
-
-    diskMap.clear();
-    for (String block : blocks) {
-      for (int i = 0; i < block.length(); i++) {
-        diskMap.add(Character.toString(block.charAt(i)));
-      }
-    }
-
-    if (diskMapCopy.equals(String.join("", diskMap))) {
-      return;
-    }
-    diskMapCopy = String.join("", diskMap);
-    compactFiles();
   }
 
   private void getChecksum() {
@@ -147,8 +122,6 @@ public class Solver {
   public String partOne() {
     loadInput("2024/Day09/input.txt");
 
-    checksum = 0L;
-
     generateDiskMap();
     compactSpace();
     getChecksum();
@@ -159,10 +132,7 @@ public class Solver {
   public String partTwo() {
     loadInput("2024/Day09/input.txt");
 
-    checksum = 0L;
-
     generateDiskMap();
-    diskMapCopy = String.join("", diskMap);
     compactFiles();
     getChecksum();
 

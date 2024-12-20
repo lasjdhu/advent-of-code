@@ -10,6 +10,6 @@ public class Main {
     System.out.println("Part One Result: " + resultPartOne);
 
     String resultPartTwo = solver.partTwo();
-    System.out.println("Part Two Result (wrong): " + resultPartTwo);
+    System.out.println("Part Two Result: " + resultPartTwo);
   }
 }
