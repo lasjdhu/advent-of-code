@@ -79,6 +79,57 @@ public class Solver {
     return -1;
   }
 
+  private int calculateCheats(int startX, int startY) {
+    int rows = grid.size();
+    int cols = grid.get(0).size();
+    Map<String, Integer> positions = new HashMap<>();
+    int cheatCount = 0;
+
+    Queue<int[]> queue = new LinkedList<>();
+    queue.add(new int[]{startX, startY, 0});
+    boolean[][] visited = new boolean[rows][cols];
+    visited[startX][startY] = true;
+
+    while (!queue.isEmpty()) {
+      int[] current = queue.poll();
+      int x = current[0], y = current[1], dist = current[2];
+      positions.put(x + "," + y, dist);
+
+      for (int[] dir : new int[][]{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}) {
+        int newX = x + dir[0];
+        int newY = y + dir[1];
+
+        if (newX >= 0 && newX < rows && newY >= 0 && newY < cols &&
+          !visited[newX][newY] && grid.get(newX).get(newY) != LabyrinthObject.WALL) {
+          visited[newX][newY] = true;
+          queue.add(new int[]{newX, newY, dist + 1});
+        }
+      }
+    }
+
+    for (Map.Entry<String, Integer> entry : positions.entrySet()) {
+      String[] coords = entry.getKey().split(",");
+      int x = Integer.parseInt(coords[0]);
+      int y = Integer.parseInt(coords[1]);
+      int dist = entry.getValue();
+
+      for (int dx = -20; dx <= 20; dx++) {
+        for (int dy = -20; dy <= 20; dy++) {
+          int newX = x + dx;
+          int newY = y + dy;
+          if (Math.abs(dx) + Math.abs(dy) <= 20 && positions.containsKey(newX + "," + newY)) {
+            int neighborDist = positions.get(newX + "," + newY);
+            if (neighborDist - dist - (Math.abs(dx) + Math.abs(dy)) >= 100) {
+              cheatCount++;
+            }
+          }
+        }
+      }
+    }
+
+    return cheatCount;
+  }
+
   private void findStartEnd(int[] start, int[] end) {
     int rows = grid.size();
     int cols = grid.get(0).size();
@@ -144,7 +195,14 @@ public class Solver {
 
   public String partTwo() {
     loadInput("2024/Day20/input.txt");
+    fillGrid();
 
-    return Integer.toString(0);
+    int[] start = new int[2];
+    int[] end = new int[2];
+    findStartEnd(start, end);
+
+    int cheats = calculateCheats(start[0], start[1]);
+
+    return Integer.toString(cheats);
   }
 }
