@@ -7,13 +7,11 @@ while [[ $# -gt 0 ]]; do
   case $1 in
   -y | --year)
     YEAR="$2"
-    shift
-    shift
+    shift 2
     ;;
   -d | --day)
     DAY="$2"
-    shift
-    shift
+    shift 2
     ;;
   *)
     echo "Unknown option $1"
@@ -27,10 +25,17 @@ if [[ -z "$YEAR" || -z "$DAY" ]]; then
   exit 1
 fi
 
-javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out
-if [[ $? -ne 0 ]]; then
-  echo "Compilation failed."
+if [[ "$YEAR" -eq 2024 ]]; then
+  javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out
+  if [[ $? -ne 0 ]]; then
+    echo "Compilation failed."
+    exit 1
+  fi
+  java -cp out "Day$DAY.Main"
+elif [[ "$YEAR" -eq 2025 ]]; then
+  node "2025/Day$DAY/main.js"
+else
+  echo "Unsupported year: $YEAR"
   exit 1
 fi
 
-java -cp out "Day$DAY.Main"
