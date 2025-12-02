@@ -95,122 +95,93 @@ public class Solver {
   }
 
   private boolean pushChainOfBoxes(int boxX, int boxY, int moveX, int moveY, boolean wide, WarehouseObject boxType) {
-    int nextBoxX = boxX + moveX;
-    int nextBoxY = boxY + moveY;
+    List<int[]> chain = new ArrayList<>();
+    java.util.HashSet<String> seen = new java.util.HashSet<>();
 
-    // Wall check
-    if (grid.get(nextBoxY).get(nextBoxX) == WarehouseObject.WALL) {
-        return false;
+    if (wide) {
+      int leftX = (boxType == WarehouseObject.BOX_L) ? boxX : (boxX - 1);
+      chain.add(new int[]{leftX, boxY, 1});
+      seen.add(leftX + "," + boxY + ",1");
+    } else {
+      chain.add(new int[]{boxX, boxY, 0});
+      seen.add(boxX + "," + boxY + ",0");
     }
 
-    // For vertical movement in wide mode, we need to check adjacent boxes
-    if (wide && moveY != 0) {
-        // Get all connected boxes at the same Y level
-        List<Integer> connectedBoxesX = new ArrayList<>();
-        if (boxType == WarehouseObject.BOX_L) {
-            connectedBoxesX.add(boxX);
-            connectedBoxesX.add(boxX + 1);
-            // Check for boxes to the right
-            int checkX = boxX + 2;
-            while (checkX < grid.get(boxY).size() && 
-                   (grid.get(boxY).get(checkX) == WarehouseObject.BOX_L || 
-                    grid.get(boxY).get(checkX) == WarehouseObject.BOX_R)) {
-                connectedBoxesX.add(checkX);
-                checkX++;
-            }
-        } else if (boxType == WarehouseObject.BOX_R) {
-            connectedBoxesX.add(boxX - 1);
-            connectedBoxesX.add(boxX);
-            // Check for boxes to the left
-            int checkX = boxX - 2;
-            while (checkX >= 0 && 
-                   (grid.get(boxY).get(checkX) == WarehouseObject.BOX_L || 
-                    grid.get(boxY).get(checkX) == WarehouseObject.BOX_R)) {
-                connectedBoxesX.add(checkX);
-                checkX--;
-            }
-        }
+    for (int idx = 0; idx < chain.size(); idx++) {
+      int[] unit = chain.get(idx);
+      int ux = unit[0], uy = unit[1], uWide = unit[2];
+      int[][] srcCells;
+      if (uWide == 1) {
+        srcCells = new int[][]{{ux, uy}, {ux + 1, uy}};
+      } else {
+        srcCells = new int[][]{{ux, uy}};
+      }
 
-        // First check if ALL boxes can move
-        for (int x : connectedBoxesX) {
-            if (grid.get(nextBoxY).get(x) == WarehouseObject.WALL) {
-                return false;
-            }
-        }
+      for (int[] sc : srcCells) {
+        int destX = sc[0] + moveX;
+        int destY = sc[1] + moveY;
 
-        // Then check for other boxes in the way and verify they can all move
-        boolean canPushAll = true;
-        for (int x : connectedBoxesX) {
-            if (grid.get(nextBoxY).get(x) == WarehouseObject.BOX_L ||
-                grid.get(nextBoxY).get(x) == WarehouseObject.BOX_R) {
-                if (!pushChainOfBoxes(x, nextBoxY, moveX, moveY, wide, grid.get(nextBoxY).get(x))) {
-                    canPushAll = false;
-                    break;
-                }
-            }
-        }
+        if (destY < 0 || destY >= grid.size()) return false;
+        if (destX < 0 || destX >= grid.get(destY).size()) return false;
 
-        if (!canPushAll) {
-            return false;
-        }
+        WarehouseObject dest = grid.get(destY).get(destX);
+        if (dest == WarehouseObject.WALL) return false;
+        if (dest == WarehouseObject.ROBOT) return false;
 
-        // Only move boxes if all checks passed
-        for (int x : connectedBoxesX) {
-            grid.get(nextBoxY).set(x, grid.get(boxY).get(x));
-            grid.get(boxY).set(x, WarehouseObject.EMPTY);
+        if (dest == WarehouseObject.BOX) {
+          String key = destX + "," + destY + ",0";
+          if (!seen.contains(key)) {
+            chain.add(new int[]{destX, destY, 0});
+            seen.add(key);
+          }
+        } else if (dest == WarehouseObject.BOX_L) {
+          String key = destX + "," + destY + ",1";
+          if (!seen.contains(key)) {
+            chain.add(new int[]{destX, destY, 1});
+            seen.add(key);
+          }
+        } else if (dest == WarehouseObject.BOX_R) {
+          int leftAnchor = destX - 1;
+          String key = leftAnchor + "," + destY + ",1";
+          if (!seen.contains(key)) {
+            chain.add(new int[]{leftAnchor, destY, 1});
+            seen.add(key);
+          }
         }
-        return true;
+      }
     }
 
-    // Empty space - we can move the box
-    if (grid.get(nextBoxY).get(nextBoxX) == WarehouseObject.EMPTY) {
-        if (wide) {
-            if (boxType == WarehouseObject.BOX_L) {
-                grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-                grid.get(boxY).set(boxX + 1, WarehouseObject.EMPTY);
-                grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX_L);
-                grid.get(nextBoxY).set(nextBoxX + 1, WarehouseObject.BOX_R);
-            } else if (boxType == WarehouseObject.BOX_R) {
-                grid.get(boxY).set(boxX - 1, WarehouseObject.EMPTY);
-                grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-                grid.get(nextBoxY).set(nextBoxX - 1, WarehouseObject.BOX_L);
-                grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX_R);
-            }
-        } else {
-            grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-            grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX);
-        }
-        return true;
+    for (int i = chain.size() - 1; i >= 0; i--) {
+      int[] u = chain.get(i);
+      int ux = u[0], uy = u[1], uWide = u[2];
+
+      if (uWide == 1) {
+        int srcL = ux, srcR = ux + 1;
+        int dstL = srcL + moveX, dstR = srcR + moveX;
+        int dstY = uy + moveY;
+
+        if (dstY < 0 || dstY >= grid.size()) return false;
+        if (dstL < 0 || dstR >= grid.get(dstY).size()) return false;
+
+        grid.get(uy).set(srcL, WarehouseObject.EMPTY);
+        grid.get(uy).set(srcR, WarehouseObject.EMPTY);
+        grid.get(dstY).set(dstL, WarehouseObject.BOX_L);
+        grid.get(dstY).set(dstR, WarehouseObject.BOX_R);
+      } else {
+        int srcX = ux;
+        int dstX = srcX + moveX;
+        int dstY = uy + moveY;
+
+        if (dstY < 0 || dstY >= grid.size()) return false;
+        if (dstX < 0 || dstX >= grid.get(dstY).size()) return false;
+
+        grid.get(uy).set(srcX, WarehouseObject.EMPTY);
+        grid.get(dstY).set(dstX, WarehouseObject.BOX);
+      }
     }
 
-    // Hit another box - try to push the chain
-    WarehouseObject nextCell = grid.get(nextBoxY).get(nextBoxX);
-    if (nextCell == WarehouseObject.BOX || nextCell == WarehouseObject.BOX_L || nextCell == WarehouseObject.BOX_R) {
-        // Try to push the next box in the chain
-        if (pushChainOfBoxes(nextBoxX, nextBoxY, moveX, moveY, wide, nextCell)) {
-            // If chain was pushed successfully, move our current box
-            if (wide) {
-                if (boxType == WarehouseObject.BOX_L) {
-                    grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-                    grid.get(boxY).set(boxX + 1, WarehouseObject.EMPTY);
-                    grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX_L);
-                    grid.get(nextBoxY).set(nextBoxX + 1, WarehouseObject.BOX_R);
-                } else if (boxType == WarehouseObject.BOX_R) {
-                    grid.get(boxY).set(boxX - 1, WarehouseObject.EMPTY);
-                    grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-                    grid.get(nextBoxY).set(nextBoxX - 1, WarehouseObject.BOX_L);
-                    grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX_R);
-                }
-            } else {
-                grid.get(boxY).set(boxX, WarehouseObject.EMPTY);
-                grid.get(nextBoxY).set(nextBoxX, WarehouseObject.BOX);
-            }
-            return true;
-        }
-    }
-    
-    return false;
-}
+    return true;
+  }
 
   private void tick(char move) {
     int moveX = 0;
@@ -295,36 +266,6 @@ public class Solver {
     return sum;
   }
 
-  private void printGid() {
-    for (int i = 0; i < grid.size(); i++) {
-      for (int j = 0; j < grid.get(0).size(); j++) {
-      WarehouseObject cell = grid.get(i).get(j);
-      switch (cell) {
-        case EMPTY:
-          System.out.print(".");
-          break;
-        case WALL:
-          System.out.print("#");
-          break;
-        case BOX:
-          System.out.print("O");
-          break;
-        case BOX_L:
-          System.out.print("[");
-          break;
-        case BOX_R:
-          System.out.print("]");
-          break;
-        case ROBOT:
-          System.out.print("@");
-          break;
-      }
-      }
-      System.out.println();
-    }
-    System.out.println();
-  }
-
   public String partOne() {
     loadInput("2024/Day15/input.txt");
 
@@ -338,14 +279,12 @@ public class Solver {
   }
 
   public String partTwo() {
-    loadInput("2024/Day15/mockupInput.txt");
+    loadInput("2024/Day15/input.txt");
 
     parseMapAndMoves(true);
-    printGid();
     while (!moveQueue.isEmpty()) {
       char move = moveQueue.poll();
       tick(move);
-      printGid();
     }
 
     return Integer.toString(findGPSSum());
