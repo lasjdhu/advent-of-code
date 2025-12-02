@@ -1,6 +1,6 @@
 #include "file_utils.h"
 
-char **readLines(const char *filename, int *countOut) {
+char **read_lines(const char *filename, int *countOut) {
   *countOut = 0;
 
   FILE *f = fopen(filename, "r");
@@ -56,7 +56,7 @@ char **readLines(const char *filename, int *countOut) {
   return lines;
 }
 
-char *readLine(const char *filename) {
+char *read_line(const char *filename) {
   FILE *f = fopen(filename, "rb");
   if (!f) {
     fprintf(stderr, "Unable to open file: %s\n", filename);
@@ -85,7 +85,7 @@ char *readLine(const char *filename) {
   return buffer;
 }
 
-void freeLines(char **lines, int count) {
+void free_lines(char **lines, int count) {
   if (!lines)
     return;
 
