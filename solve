@@ -27,7 +27,10 @@ fi
 
 mkdir -p out
 
-if [[ "$YEAR" -eq 2024 ]]; then
+if [[ "$YEAR" -eq 2023 ]]; then
+  (cd "$YEAR" && cargo run -- "$DAY") || exit 1
+
+elif [[ "$YEAR" -eq 2024 ]]; then
   javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out || exit 1
   java -cp out "Day$DAY.Main"
 
