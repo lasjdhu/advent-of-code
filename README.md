@@ -3,8 +3,15 @@
 ## Usage
 
 ```sh
-./solve -y 2024 -d 01
+./solve -y 2025 -d 01
 ```
+
+## 📁 2025 Tasks List
+
+| Day | Name                                                   | Stars |
+| --- | ------------------------------------------------------ | ----- |
+| 1   | [Secret Entrance](https://adventofcode.com/2025/day/1) | ⭐⭐  |
+| 2   | [Gift Shop](https://adventofcode.com/2025/day/2)       | ⭐⭐  |
 
 ## 📁 2024 Tasks List
 
@@ -36,9 +43,9 @@
 | 24  | [Crossed Wires](https://adventofcode.com/2024/day/24)          | ⭐    |
 | 25  | [Code Chronicle](https://adventofcode.com/2024/day/25)         | ⭐    |
 
-## 📁 2025 Tasks List
+## 📁 2015 Tasks List
 
-| Day | Name                                                   | Stars |
-| --- | ------------------------------------------------------ | ----- |
-| 1   | [Secret Entrance](https://adventofcode.com/2025/day/1) | ⭐⭐  |
-| 2   | [Gift Shop](https://adventofcode.com/2025/day/2)       | ⭐⭐  |
+| Day | Name                                                                     | Stars |
+| --- | ------------------------------------------------------------------------ | ----- |
+| 1   | [I Was Told There Would Be No Math](https://adventofcode.com/2015/day/1) | ⭐⭐  |
+| 2   | [Not Quite Lisp](https://adventofcode.com/2015/day/2)                    | ⭐⭐  |
