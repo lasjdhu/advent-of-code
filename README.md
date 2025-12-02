@@ -40,7 +40,7 @@
 | 21  | [Keypad Conundrum](https://adventofcode.com/2024/day/21)       | ⭐⭐  |
 | 22  | [Monkey Market](https://adventofcode.com/2024/day/22)          | ⭐⭐  |
 | 23  | [LAN Party](https://adventofcode.com/2024/day/23)              | ⭐⭐  |
-| 24  | [Crossed Wires](https://adventofcode.com/2024/day/24)          | ⭐    |
+| 24  | [Crossed Wires](https://adventofcode.com/2024/day/24)          | ⭐⭐  |
 | 25  | [Code Chronicle](https://adventofcode.com/2024/day/25)         | ⭐    |
 
 ## 📁 2015 Tasks List
