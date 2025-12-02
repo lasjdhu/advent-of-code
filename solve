@@ -25,15 +25,23 @@ if [[ -z "$YEAR" || -z "$DAY" ]]; then
   exit 1
 fi
 
+mkdir -p out
+
 if [[ "$YEAR" -eq 2024 ]]; then
-  javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out
+  javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out || exit 1
+  java -cp out "Day$DAY.Main"
+
+elif [[ "$YEAR" -eq 2025 ]]; then
+  node "$YEAR/Day$DAY/main.js"
+
+elif [[ "$YEAR" -eq 2015 ]]; then
+  gcc "$YEAR/utils/"*.c "$YEAR/Day$DAY/"*.c -o "out/${YEAR}_day${DAY}"
   if [[ $? -ne 0 ]]; then
-    echo "Compilation failed."
+    echo "C compilation failed."
     exit 1
   fi
-  java -cp out "Day$DAY.Main"
-elif [[ "$YEAR" -eq 2025 ]]; then
-  node "2025/Day$DAY/main.js"
+  "./out/${YEAR}_day${DAY}"
+
 else
   echo "Unsupported year: $YEAR"
   exit 1
