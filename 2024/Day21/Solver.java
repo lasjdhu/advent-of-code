@@ -1,65 +1,59 @@
-
 package Day21;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Queue;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import utils.FileUtils;
-
-class Position {
-  int row;
-  int col;
-
-  Position(int row, int col) {
-    this.row = row;
-    this.col = col;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-    Position position = (Position) obj;
-    return row == position.row && col == position.col;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(row, col);
-  }
-}
-
-class State {
-  Position position;
-  List<Character> sequence;
-  int matchedLength;
-
-  State(Position position, List<Character> sequence, int matchedLength) {
-    this.position = position;
-    this.sequence = sequence;
-    this.matchedLength = matchedLength;
-  }
-}
 
 public class Solver {
 
   private List<String> input = new ArrayList<>();
-  private char[][] NUMERIC_KEYPAD = {
-    {'7', '8', '9'},
-    {'4', '5', '6'},
-    {'1', '2', '3'},
-    {' ', '0', 'A'}
+
+  private static final char[][] NUMERIC_LAYOUT = {
+    {'7','8','9'},
+    {'4','5','6'},
+    {'1','2','3'},
+    {' ','0','A'}
   };
-  private char[][] DIRECTIONAL_KEYPAD = {
-    {' ', '^', 'A'},
-    {'<', 'v', '>'}
+
+  private static final char[][] DIR_LAYOUT = {
+    {' ','^','A'},
+    {'<','v','>'}
   };
+
+  private Map<Point, Character> numericPad = new HashMap<>();
+  private Map<Point, Character> directionalPad = new HashMap<>();
+
+  private Map<Pair<Character, Character>, List<String>> numericPaths;
+  private Map<Pair<Character, Character>, List<String>> directionalPaths;
+
+  private Map<Pair<String, Integer>, Long> cache;
+
+  private record Point(int r,int c) {
+    List<Point> cardinals() {
+      return List.of(
+        new Point(r-1,c),
+        new Point(r+1,c),
+        new Point(r,c-1),
+        new Point(r,c+1)
+      );
+    }
+
+    char diffToChar(Point other) {
+      if (other.r == r-1) return '^';
+      if (other.r == r+1) return 'v';
+      if (other.c == c-1) return '<';
+      if (other.c == c+1) return '>';
+      throw new IllegalArgumentException("Invalid move from " + this + " to " + other);
+    }
+  }
+
+  private record Pair<A,B>(A first, B second){}
+
+  public Solver() {
+    buildPads();
+    precomputePaths();
+  }
 
   private void loadInput(String filename) {
     try {
@@ -70,130 +64,124 @@ public class Solver {
     }
   }
 
-  private Position move(Position current, char direction, char[][] keypad) {
-    int newRow = current.row, newCol = current.col;
+  private void buildPads() {
+    for (int r = 0; r < NUMERIC_LAYOUT.length; r++)
+      for (int c = 0; c < NUMERIC_LAYOUT[0].length; c++)
+        if (NUMERIC_LAYOUT[r][c] != ' ')
+          numericPad.put(new Point(r,c), NUMERIC_LAYOUT[r][c]);
 
-    switch (direction) {
-      case '^':
-        newRow = Math.max(0, current.row - 1);
-        break;
-      case 'v':
-        newRow = Math.min(keypad.length - 1, current.row + 1);
-        break;
-      case '<':
-        newCol = Math.max(0, current.col - 1);
-        break;
-      case '>':
-        newCol = Math.min(keypad[0].length - 1, current.col + 1);
-        break;
-    }
-
-    if (keypad[newRow][newCol] == ' ') {
-      return current;
-    }
-    return new Position(newRow, newCol);
+    for (int r = 0; r < DIR_LAYOUT.length; r++)
+      for (int c = 0; c < DIR_LAYOUT[0].length; c++)
+        if (DIR_LAYOUT[r][c] != ' ')
+          directionalPad.put(new Point(r,c), DIR_LAYOUT[r][c]);
   }
 
-  private List<List<Character>> getAllShortestSequences(char[][] keypad, Position start, String target) {
-    Queue<State> queue = new LinkedList<>();
-    Map<String, Integer> visited = new HashMap<>();
-    List<List<Character>> shortestSequences = new ArrayList<>();
-    int shortestLength = Integer.MAX_VALUE;
+  private void precomputePaths() {
+    numericPaths = computeMinimalPaths(numericPad);
+    directionalPaths = computeMinimalPaths(directionalPad);
+  }
 
-    State initialState = new State(start, new ArrayList<>(), 0);
-    queue.add(initialState);
-    visited.put(getStateKey(initialState), 0);
+  private Map<Pair<Character, Character>, List<String>> computeMinimalPaths(Map<Point, Character> pad) {
+    Map<Pair<Character, Character>, List<String>> paths = new HashMap<>();
+    List<Point> points = new ArrayList<>(pad.keySet());
+    for (Point start : points) {
+      for (Point end : points) {
+        List<String> pathList = bfsAllPaths(pad, start, end);
+        paths.put(new Pair<>(pad.get(start), pad.get(end)), pathList);
+      }
+    }
+    return paths;
+  }
+
+  private List<String> bfsAllPaths(Map<Point, Character> pad, Point start, Point end) {
+    Queue<List<Point>> queue = new ArrayDeque<>();
+    queue.add(List.of(start));
+    Map<Point, Integer> minDist = new HashMap<>();
+    minDist.put(start, 0);
+    List<String> result = new ArrayList<>();
+    int costAtGoal = -1;
 
     while (!queue.isEmpty()) {
-      State current = queue.poll();
+      List<Point> path = queue.poll();
+      Point current = path.get(path.size() - 1);
+      int cost = path.size() - 1;
 
-      if (current.sequence.size() > shortestLength) {
+      if (costAtGoal != -1 && cost > costAtGoal) break;
+
+      if (current.equals(end)) {
+        costAtGoal = cost;
+        result.add(pathToString(path) + "A");
         continue;
       }
 
-      if (current.matchedLength == target.length()) {
-        if (current.sequence.size() < shortestLength) {
-          shortestSequences.clear();
-          shortestLength = current.sequence.size();
-        }
-        if (current.sequence.size() == shortestLength) {
-          shortestSequences.add(new ArrayList<>(current.sequence));
-        }
-        continue;
-      }
-
-      for (char move : new char[]{'<', '>', '^', 'v', 'A'}) {
-        Position newPos = new Position(current.position.row, current.position.col);
-        int newMatchedLength = current.matchedLength;
-
-        if (move == 'A') {
-          if (newMatchedLength < target.length() &&
-            keypad[newPos.row][newPos.col] == target.charAt(newMatchedLength)) {
-            newMatchedLength++;
-          } else {
-            continue;
+      for (Point n : current.cardinals()) {
+        if (pad.containsKey(n)) {
+          int newDist = cost + 1;
+          if (minDist.getOrDefault(n, Integer.MAX_VALUE) >= newDist) {
+            minDist.put(n, newDist);
+            List<Point> newPath = new ArrayList<>(path);
+            newPath.add(n);
+            queue.add(newPath);
           }
-        } else {
-          newPos = move(newPos, move, keypad);
-        }
-
-        List<Character> newSequence = new ArrayList<>(current.sequence);
-        newSequence.add(move);
-        State newState = new State(newPos, newSequence, newMatchedLength);
-
-        String stateKey = getStateKey(newState);
-        Integer previousLength = visited.get(stateKey);
-
-        if (previousLength == null || newSequence.size() <= previousLength) {
-          visited.put(stateKey, newSequence.size());
-          queue.add(newState);
         }
       }
     }
 
-    return shortestSequences;
+    return result;
   }
 
-  private String toStringList(List<Character> sequence) {
+  private String pathToString(List<Point> path) {
     StringBuilder sb = new StringBuilder();
-    for (char c : sequence) sb.append(c);
+    for (int i = 0; i < path.size()-1; i++)
+      sb.append(path.get(i).diffToChar(path.get(i+1)));
     return sb.toString();
   }
 
-  private String getStateKey(State state) {
-    return state.position.row + "," + state.position.col + "," + state.matchedLength;
+  private long findCost(String code, int depth, Map<Pair<Character, Character>, List<String>> transitions) {
+    if (cache == null) cache = new HashMap<>();
+    Pair<String, Integer> key = new Pair<>(code, depth);
+    if (cache.containsKey(key)) return cache.get(key);
+
+    long total = 0;
+    String seq = "A" + code;
+
+    for (int i = 0; i < seq.length() - 1; i++) {
+      char from = seq.charAt(i);
+      char to = seq.charAt(i+1);
+      List<String> paths = transitions.get(new Pair<>(from, to));
+      if (depth == 0) {
+        total += paths.stream().mapToInt(String::length).min().orElseThrow();
+      } else {
+        long min = Long.MAX_VALUE;
+        for (String path : paths) {
+          long val = findCost(path, depth - 1, directionalPaths);
+          if (val < min) min = val;
+        }
+        total += min;
+      }
+    }
+
+    cache.put(key, total);
+    return total;
+  }
+
+  private long solve(int depth) {
+    long total = 0;
+    for (String code : input) {
+      long numeric = Long.parseLong(code.substring(0, code.length()-1));
+      total += findCost(code, depth, numericPaths) * numeric;
+    }
+    return total;
   }
 
   public String partOne() {
     loadInput("2024/Day21/input.txt");
-
-    int totalComplexity = 0;
-    for (String code : input) {
-      List<List<Character>> numericSequences = getAllShortestSequences(NUMERIC_KEYPAD, new Position(3, 2), code);
-
-      int shortestOverallLength = Integer.MAX_VALUE;
-      for (List<Character> numericSequence : numericSequences) {
-        List<List<Character>> firstRobotPaths = getAllShortestSequences(DIRECTIONAL_KEYPAD, new Position(0, 2), toStringList(numericSequence));
-
-        for (List<Character> firstRobotPath : firstRobotPaths) {
-          List<List<Character>> secondRobotPaths = getAllShortestSequences(DIRECTIONAL_KEYPAD, new Position(0, 2), toStringList(firstRobotPath));
-
-          for (List<Character> secondRobotPath : secondRobotPaths) {
-            shortestOverallLength = Math.min(shortestOverallLength, secondRobotPath.size());
-          }
-        }
-      }
-
-      int numericValue = Integer.parseInt(code.replaceAll("[^0-9]", ""));
-      totalComplexity += shortestOverallLength * numericValue;
-    }
-
-    return Integer.toString(totalComplexity);
+    return Long.toString(solve(2));
   }
 
   public String partTwo() {
     loadInput("2024/Day21/input.txt");
-    return Integer.toString(0);
+    return Long.toString(solve(25));
   }
 }
 
