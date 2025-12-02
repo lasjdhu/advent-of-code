@@ -93,9 +93,4 @@ public class Solver {
 
     return Integer.toString(validFitCount);
   }
-
-  public String partTwo() {
-    loadInput("2024/Day25/mockupInput.txt");
-    return Integer.toString(0);
-  }
 }
