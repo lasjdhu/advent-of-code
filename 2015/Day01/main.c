@@ -3,11 +3,11 @@
 int main() {
   const char *filename = "2015/Day01/input.txt";
 
-  int resultFirst = solveFirst(filename);
-  printf("%d\n", resultFirst);
+  int result_first = solve_first(filename);
+  printf("%d\n", result_first);
 
-  int resultSecond = solveSecond(filename);
-  printf("%d\n", resultSecond);
+  int result_second = solve_second(filename);
+  printf("%d\n", result_second);
 
   return 0;
 }

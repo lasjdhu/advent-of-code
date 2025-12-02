@@ -1,10 +1,9 @@
 #include "solver.h"
-#include "../utils/file_utils.h"
 
-int solveFirst(const char *filename) {
+int solve_first(const char *filename) {
   int floor = 0;
 
-  char *content = readLine(filename);
+  char *content = read_line(filename);
   if (!content) {
     fprintf(stderr, "Failed to read full content.\n");
     return 0;
@@ -24,11 +23,11 @@ int solveFirst(const char *filename) {
   return floor;
 }
 
-int solveSecond(const char *filename) {
+int solve_second(const char *filename) {
   int floor = 0;
   int position = 0;
 
-  char *content = readLine(filename);
+  char *content = read_line(filename);
   if (!content) {
     fprintf(stderr, "Failed to read full content.\n");
     return 0;
