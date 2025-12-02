@@ -89,6 +89,14 @@ public class Solver {
       .collect(Collectors.joining());
   }
 
+  private List<Map.Entry<String, String>> getGateOperations() {
+    return gateDefinitions.entrySet()
+      .stream()
+      .filter(e -> e.getValue().contains(" "))
+      .collect(Collectors.toList());
+  }
+
+
   public String partOne() {
     loadInput("2024/Day24/input.txt");
     parseInput();
@@ -99,7 +107,63 @@ public class Solver {
   }
 
   public String partTwo() {
-    loadInput("2024/Day24/mockupInput.txt");
-    return "0";
+    loadInput("2024/Day24/input.txt");
+    parseInput();
+    List<Map.Entry<String, String>> operations = getGateOperations();
+    List<String> wrong = new ArrayList<>();
+
+    for (Map.Entry<String, String> entry : operations) {
+      String out = entry.getKey();
+      String expr = entry.getValue();
+      String[] tokens = expr.split(" ");
+      if (tokens.length != 3) continue;
+      String w1 = tokens[0];
+      String op = tokens[1];
+      String w2 = tokens[2];
+
+      if (out.startsWith("z") && !op.equals("XOR") && !out.equals("z45")) {
+        wrong.add(out);
+      }
+
+      if (op.equals("XOR") &&
+        !(out.startsWith("x") || out.startsWith("y") || out.startsWith("z")) &&
+        !(w1.startsWith("x") || w1.startsWith("y") || w1.startsWith("z")) &&
+        !(w2.startsWith("x") || w2.startsWith("y") || w2.startsWith("z"))) {
+        wrong.add(out);
+      }
+
+      if (op.equals("AND") && !w1.equals("x00") && !w2.equals("x00")) {
+        for (Map.Entry<String, String> e2 : operations) {
+          String[] tokens2 = e2.getValue().split(" ");
+          if (tokens2.length == 3) {
+            String w1_2 = tokens2[0];
+            String w2_2 = tokens2[2];
+            String op2 = tokens2[1];
+            if ((out.equals(w1_2) || out.equals(w2_2)) && !op2.equals("OR")) {
+              wrong.add(out);
+              break;
+            }
+          }
+        }
+      }
+
+      if (op.equals("XOR")) {
+        for (Map.Entry<String, String> e2 : operations) {
+          String[] tokens2 = e2.getValue().split(" ");
+          if (tokens2.length == 3) {
+            String w1_2 = tokens2[0];
+            String w2_2 = tokens2[2];
+            String op2 = tokens2[1];
+            if ((out.equals(w1_2) || out.equals(w2_2)) && op2.equals("OR")) {
+              wrong.add(out);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return wrong.stream().distinct().sorted().collect(Collectors.joining(","));
   }
+
 }
