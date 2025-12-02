@@ -47,5 +47,5 @@
 
 | Day | Name                                                                     | Stars |
 | --- | ------------------------------------------------------------------------ | ----- |
-| 1   | [I Was Told There Would Be No Math](https://adventofcode.com/2015/day/1) | ⭐⭐  |
-| 2   | [Not Quite Lisp](https://adventofcode.com/2015/day/2)                    | ⭐⭐  |
+| 1   | [Not Quite Lisp](https://adventofcode.com/2015/day/1)                    | ⭐⭐  |
+| 2   | [I Was Told There Would Be No Math](https://adventofcode.com/2015/day/2) | ⭐⭐  |
