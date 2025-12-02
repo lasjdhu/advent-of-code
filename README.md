@@ -43,6 +43,12 @@
 | 24  | [Crossed Wires](https://adventofcode.com/2024/day/24)          | ⭐⭐  |
 | 25  | [Code Chronicle](https://adventofcode.com/2024/day/25)         | ⭐⭐  |
 
+## 📁 2023 Tasks List
+
+| Day | Name                                               | Stars |
+| --- | -------------------------------------------------- | ----- |
+| 1   | [Trebuchet?!](https://adventofcode.com/2023/day/1) | ⭐⭐  |
+
 ## 📁 2015 Tasks List
 
 | Day | Name                                                                     | Stars |
