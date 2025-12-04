@@ -55,3 +55,4 @@
 | --- | ------------------------------------------------------------------------ | ----- |
 | 1   | [Not Quite Lisp](https://adventofcode.com/2015/day/1)                    | ⭐⭐  |
 | 2   | [I Was Told There Would Be No Math](https://adventofcode.com/2015/day/2) | ⭐⭐  |
+| 3   | [Lobby](https://adventofcode.com/2025/day/3)                             | ⭐⭐  |
