@@ -6,7 +6,7 @@
 ./solve -y 2025 -d 01
 ```
 
-## 📁 2025 Tasks List
+## 📁 2025 Tasks List (12/24)
 
 | Day | Name                                                       | Stars |
 | --- | ---------------------------------------------------------- | ----- |
@@ -17,7 +17,7 @@
 | 5   | [Cafeteria](https://adventofcode.com/2025/day/5)           | ⭐⭐  |
 | 6   | [Trash Compactor](https://adventofcode.com/2025/day/6)     | ⭐⭐  |
 
-## 📁 2024 Tasks List
+## 📁 2024 Tasks List (50/50)
 
 | Day | Name                                                           | Stars |
 | --- | -------------------------------------------------------------- | ----- |
@@ -47,13 +47,13 @@
 | 24  | [Crossed Wires](https://adventofcode.com/2024/day/24)          | ⭐⭐  |
 | 25  | [Code Chronicle](https://adventofcode.com/2024/day/25)         | ⭐⭐  |
 
-## 📁 2023 Tasks List
+## 📁 2023 Tasks List (8/50)
 
 | Day | Name                                               | Stars |
 | --- | -------------------------------------------------- | ----- |
 | 1   | [Trebuchet?!](https://adventofcode.com/2023/day/1) | ⭐⭐  |
 
-## 📁 2015 Tasks List
+## 📁 2015 Tasks List (4/50)
 
 | Day | Name                                                                     | Stars |
 | --- | ------------------------------------------------------------------------ | ----- |
