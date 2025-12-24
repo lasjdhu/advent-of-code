@@ -6,7 +6,7 @@
 ./solve -y 2025 -d 01
 ```
 
-## 📁 2025 Tasks List (18/24)
+## 📁 2025 Tasks List (20/24)
 
 | Day | Name                                                       | Stars |
 | --- | ---------------------------------------------------------- | ----- |
@@ -19,6 +19,7 @@
 | 7   | [Laboratories](https://adventofcode.com/2025/day/7)        | ⭐⭐  |
 | 8   | [Playground](https://adventofcode.com/2025/day/8)          | ⭐⭐  |
 | 9   | [Movie Theater](https://adventofcode.com/2025/day/9)       | ⭐⭐  |
+| 10  | [Factory](https://adventofcode.com/2025/day/10)            | ⭐⭐  |
 
 ## 📁 2024 Tasks List (50/50)
 
