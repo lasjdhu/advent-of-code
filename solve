@@ -1,0 +1,52 @@
+#!/bin/sh
+
+YEAR=""
+DAY=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -y | --year)
+    YEAR="$2"
+    shift 2
+    ;;
+  -d | --day)
+    DAY="$2"
+    shift 2
+    ;;
+  *)
+    echo "Unknown option $1"
+    exit 1
+    ;;
+  esac
+done
+
+if [[ -z "$YEAR" || -z "$DAY" ]]; then
+  echo "Usage: $0 -y <YEAR> -d <DAY>"
+  exit 1
+fi
+
+mkdir -p out
+
+if [[ "$YEAR" -eq 2023 ]]; then
+  (cd "$YEAR" && cargo run -- "$DAY") || exit 1
+
+elif [[ "$YEAR" -eq 2024 ]]; then
+  javac "$YEAR/utils/FileUtils.java" "$YEAR/Day$DAY/"*.java -d out || exit 1
+  java -cp out "Day$DAY.Main"
+
+elif [[ "$YEAR" -eq 2025 ]]; then
+  node "$YEAR/Day$DAY/main.js"
+
+elif [[ "$YEAR" -eq 2015 ]]; then
+  gcc "$YEAR/utils/"*.c "$YEAR/Day$DAY/"*.c -o "out/${YEAR}_day${DAY}"
+  if [[ $? -ne 0 ]]; then
+    echo "C compilation failed."
+    exit 1
+  fi
+  "./out/${YEAR}_day${DAY}"
+
+else
+  echo "Unsupported year: $YEAR"
+  exit 1
+fi
+
